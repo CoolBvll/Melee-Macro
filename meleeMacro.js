@@ -1,5 +1,6 @@
 /*
-Wynncraft Melee Macro by WaiZ and 
+Wynncraft Melee Macro by WaiZ and Rikko (https://github.com/richard-marc)
+https://github.com/CoolBvll/Melee-Macro
 */
 
 if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad');
@@ -7,8 +8,9 @@ if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad');
 var mouseDown = false;
 var SpellDetected = false;
 
+//Checks if the user started a spell.
 JsMacros.on('Title', JavaWrapper.methodToJava(event => {
-    var ARCHER_TOGGLE_CONFIG = require('../config/archerToggle.json');
+    var ARCHER_TOGGLE_CONFIG = require('./archerToggle.json');
     var archerToggle = ARCHER_TOGGLE_CONFIG.archerToggle === 'true';
 
     let actionBar = event.message.withoutFormatting();
@@ -27,8 +29,9 @@ JsMacros.on('Title', JavaWrapper.methodToJava(event => {
     }
 }));
 
+//The Macro itself.
 JsMacros.on('Key', true, JavaWrapper.methodToJava((event, context) => {
-    var ARCHER_TOGGLE_CONFIG = require('../config/archerToggle.json');
+    var ARCHER_TOGGLE_CONFIG = require('./archerToggle.json');
     var archerToggle = ARCHER_TOGGLE_CONFIG.archerToggle === 'true';
 
     if (archerToggle) {
