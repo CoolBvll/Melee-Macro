@@ -1,6 +1,6 @@
 # Melee Macro
 ## Feature
-- Allow you to hold the attack button to spam attacks. \n
+- Allow you to hold the attack button to spam attacks.
 - Anti-spam while casting a spell.
 ## How to use
 1. Download the Melee Macro folder to the JSMacro macros folder.
