@@ -7,11 +7,6 @@ if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad');
 
 var mouseDown = false;
 
-function performMelee(sleepTime) {
-    KeyBind.pressKeyBind("key.wynncraft-spell-caster.spell.melee");
-    Time.sleep(sleepTime);
-}
-
 function handleArcherClick(context, sleepTime) {
     mouseDown = true;
     context.releaseLock();
