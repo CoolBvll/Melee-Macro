@@ -1,78 +1,82 @@
 /*
-Wynncraft Melee Macro by WaiZ and Rikko (https://github.com/richard-marc)
-https://github.com/CoolBvll/Melee-Macro
+Wynncraft Melee Macro by WaiZ
+https://github.com/CoolBvll/Melee-Macro 
 */
 
 if (!World.isWorldLoaded()) JsMacros.waitForEvent('ChunkLoad');
 
 var mouseDown = false;
-var SpellDetected = false;
 
-//Checks if the user started a spell.
-JsMacros.on('Title', JavaWrapper.methodToJava(event => {
-    var ARCHER_TOGGLE_CONFIG = require('./archerToggle.json');
-    var archerToggle = ARCHER_TOGGLE_CONFIG.archerToggle === 'true';
+function performMelee(sleepTime) {
+    KeyBind.pressKeyBind("key.wynncraft-spell-caster.spell.melee");
+    Time.sleep(sleepTime);
+}
 
-    let actionBar = event.message.withoutFormatting();
-    if (archerToggle) {
-        if (actionBar.getString().startsWith("L-")) {
-            SpellDetected = true;
-        } else {
-            SpellDetected = false;
-        }
-    } else {
-        if (actionBar.getString().startsWith("R-")) {
-            SpellDetected = true;
-        } else {
-            SpellDetected = false;
-        }
+function handleArcherClick(context, sleepTime) {
+    mouseDown = true;
+    context.releaseLock();
+
+    while (mouseDown) {
+        KeyBind.releaseKeyBind('key.interact');
+        KeyBind.pressKeyBind("key.interact");
+        Time.sleep(sleepTime);
     }
-}));
+}
 
-//The Macro itself.
+function handleDefaultClick(context, sleepTime) {
+    mouseDown = true;
+    context.releaseLock();
+
+    while (mouseDown) {
+        KeyBind.pressKeyBind("key.attack");
+        Time.sleep(sleepTime);
+    }
+}
+
+function safeOpenInventory() {
+    try {
+        return Player?.openInventory() ?? null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function selectedHotbarItem(inv) { 
+    try {
+        const hotbarSlots = inv.getSlots("hotbar"); 
+        const selIdx = inv.getSelectedHotbarSlotIndex(); 
+
+        if (selIdx == null || selIdx < 0 || selIdx >= hotbarSlots.length) {
+            return null;
+        }
+
+        return inv.getSlot(hotbarSlots[selIdx]);
+    } catch (_) {
+        return null;
+    }
+}
+
 JsMacros.on('Key', true, JavaWrapper.methodToJava((event, context) => {
-    var ARCHER_TOGGLE_CONFIG = require('./archerToggle.json');
-    var archerToggle = ARCHER_TOGGLE_CONFIG.archerToggle === 'true';
+    const inv = safeOpenInventory();
+    if (!inv) return;
+
+    const itemHeld = selectedHotbarItem(inv);
+    if (!itemHeld) return;
+
+    const heldItemLore = itemHeld.getLore().toString();
+    if (!heldItemLore.includes("DPS")) return;
+
+    archerToggle = heldItemLore.includes("Archer/Hunter"); 
 
     if (archerToggle) {
-        if (event.action === 1 && event.key == "key.mouse.right") {
-            var timer = 0;
-            mouseDown = true;
-            context.releaseLock();
-
-            do {
-                timer++;
-                KeyBind.releaseKeyBind('key.interact');
-                if (SpellDetected) {
-                    Time.sleep(1);
-                } else {
-                    Player.getPlayer().interact();
-                    Time.sleep(100);
-                }
-            } while (mouseDown);
-
-        } else if (event.action === 0 && event.key == "key.mouse.right") {
-            mouseDown = false;
+        if (event.key === "key.mouse.right") {
+            if (event.action === 1) handleArcherClick(context, 100);
+            if (event.action === 0) mouseDown = false;
         }
     } else {
-        if (event.action === 1 && event.key == "key.mouse.left") {
-            var timer = 0;
-            mouseDown = true;
-            context.releaseLock();
-
-            do {
-                timer++;
-                KeyBind.releaseKeyBind('key.attack');
-                if (SpellDetected) {
-                    Time.sleep(1);
-                } else {
-                    Player.getPlayer().attack();
-                    Time.sleep(100);
-                }
-            } while (mouseDown);
-
-        } else if (event.action === 0 && event.key == "key.mouse.left") {
-            mouseDown = false;
+        if (event.key === "key.mouse.left") {
+            if (event.action === 1) handleDefaultClick(context, 100);
+            if (event.action === 0) mouseDown = false;
         }
     }
 }));
